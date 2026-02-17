@@ -4,7 +4,7 @@
 //! This module uses the pure-Rust `landlock` crate for filesystem access control.
 
 #[cfg(all(feature = "sandbox-landlock", target_os = "linux"))]
-use landlock::{AccessFS, Ruleset, RulesetCreated};
+use landlock::{AccessFs, Ruleset, RulesetAttr, RulesetCreated};
 
 use crate::security::traits::Sandbox;
 use std::path::Path;
@@ -26,7 +26,7 @@ impl LandlockSandbox {
     /// Create a Landlock sandbox with a specific workspace directory
     pub fn with_workspace(workspace_dir: Option<std::path::PathBuf>) -> std::io::Result<Self> {
         // Test if Landlock is available by trying to create a minimal ruleset
-        let test_ruleset = Ruleset::new().set_access_fs(AccessFS::read_file | AccessFS::write_file);
+        let test_ruleset = Ruleset::default().handle_access(AccessFs::ReadFile | AccessFs::WriteFile);
 
         match test_ruleset.create() {
             Ok(_) => Ok(Self { workspace_dir }),
@@ -47,18 +47,18 @@ impl LandlockSandbox {
 
     /// Apply Landlock restrictions to the current process
     fn apply_restrictions(&self) -> std::io::Result<()> {
-        let mut ruleset = Ruleset::new().set_access_fs(
-            AccessFS::read_file
-                | AccessFS::write_file
-                | AccessFS::read_dir
-                | AccessFS::remove_dir
-                | AccessFS::remove_file
-                | AccessFS::make_char
-                | AccessFS::make_sock
-                | AccessFS::make_fifo
-                | AccessFS::make_block
-                | AccessFS::make_reg
-                | AccessFS::make_sym,
+        let mut ruleset = Ruleset::default().handle_access(
+            AccessFs::ReadFile
+                | AccessFs::WriteFile
+                | AccessFs::ReadDir
+                | AccessFs::RemoveDir
+                | AccessFs::RemoveFile
+                | AccessFs::MakeChar
+                | AccessFs::MakeSock
+                | AccessFs::MakeFifo
+                | AccessFs::MakeBlock
+                | AccessFs::MakeReg
+                | AccessFs::MakeSym,
         );
 
         // Allow workspace directory (read/write)
@@ -66,7 +66,7 @@ impl LandlockSandbox {
             if workspace.exists() {
                 ruleset = ruleset.add_path(
                     workspace,
-                    AccessFS::read_file | AccessFS::write_file | AccessFS::read_dir,
+                    AccessFs::ReadFile | AccessFs::WriteFile | AccessFs::ReadDir,
                 )?;
             }
         }
@@ -74,12 +74,12 @@ impl LandlockSandbox {
         // Allow /tmp for general operations
         ruleset = ruleset.add_path(
             Path::new("/tmp"),
-            AccessFS::read_file | AccessFS::write_file,
+            AccessFs::ReadFile | AccessFs::WriteFile,
         )?;
 
         // Allow /usr and /bin for executing commands
-        ruleset = ruleset.add_path(Path::new("/usr"), AccessFS::read_file | AccessFS::read_dir)?;
-        ruleset = ruleset.add_path(Path::new("/bin"), AccessFS::read_file | AccessFS::read_dir)?;
+        ruleset = ruleset.add_path(Path::new("/usr"), AccessFs::ReadFile | AccessFs::ReadDir)?;
+        ruleset = ruleset.add_path(Path::new("/bin"), AccessFs::ReadFile | AccessFs::ReadDir)?;
 
         // Apply the ruleset
         match ruleset.create() {
@@ -97,7 +97,7 @@ impl LandlockSandbox {
 
 #[cfg(all(feature = "sandbox-landlock", target_os = "linux"))]
 impl Sandbox for LandlockSandbox {
-    fn wrap_command(&self, cmd: &mut std::process::Command) -> std::io::Result<()> {
+    fn wrap_command(&self, _cmd: &mut std::process::Command) -> std::io::Result<()> {
         // Apply Landlock restrictions before executing the command
         // Note: This affects the current process, not the child process
         // Child processes inherit the Landlock restrictions
@@ -106,8 +106,8 @@ impl Sandbox for LandlockSandbox {
 
     fn is_available(&self) -> bool {
         // Try to create a minimal ruleset to verify availability
-        Ruleset::new()
-            .set_access_fs(AccessFS::read_file)
+        Ruleset::default()
+            .handle_access(AccessFs::ReadFile)
             .create()
             .is_ok()
     }
