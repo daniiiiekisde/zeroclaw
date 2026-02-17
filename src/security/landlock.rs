@@ -28,7 +28,7 @@ impl LandlockSandbox {
         // Test if Landlock is available by trying to create a minimal ruleset
         let test_ruleset = Ruleset::default().handle_access(AccessFs::ReadFile | AccessFs::WriteFile);
 
-        match test_ruleset.create() {
+        match test_ruleset {
             Ok(_) => Ok(Self { workspace_dir }),
             Err(e) => {
                 tracing::debug!("Landlock not available: {}", e);
@@ -82,14 +82,14 @@ impl LandlockSandbox {
         ruleset = ruleset.add_path(Path::new("/bin"), AccessFs::ReadFile | AccessFs::ReadDir)?;
 
         // Apply the ruleset
-        match ruleset.create() {
+        match ruleset.restrict_self() {
             Ok(_) => {
                 tracing::debug!("Landlock restrictions applied successfully");
                 Ok(())
             }
             Err(e) => {
                 tracing::warn!("Failed to apply Landlock restrictions: {}", e);
-                Err(std::io::Error::new(std::io::ErrorKind::Other, e))
+                Err(std::io::Error::other(e.to_string()))
             }
         }
     }
