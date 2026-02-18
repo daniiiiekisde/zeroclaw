@@ -1,0 +1,292 @@
+    Blocking waiting for file lock on build directory
+    Checking zeroclaw v0.1.0 (C:\Users\Danii\zeroclaw)
+error: large future with a size of 16544 bytes
+  --> src\daemon\mod.rs:69:30
+   |
+69 |                 async move { run_heartbeat_worker(cfg).await }
+   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider `Box::pin` on it: `Box::pin(run_heartbeat_worker(cfg))`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#large_futures
+   = note: `-D clippy::large-futures` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::large_futures)]`
+
+error: it is more concise to loop over references to containers instead of using explicit iteration methods
+  --> src\hardware\introspect.rs:94:19
+   |
+94 |     for region in target.memory_map.iter() {
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^ help: to write this more concisely, try: `&target.memory_map`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#explicit_iter_loop
+   = note: `-D clippy::explicit-iter-loop` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::explicit_iter_loop)]`
+
+error: wildcard matches only a single variant and will also match any future added variants
+   --> src\hardware\introspect.rs:114:13
+    |
+114 |             _ => {}
+    |             ^ help: try: `MemoryRegion::Generic(_)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#match_wildcard_for_single_variants
+    = note: `-D clippy::match-wildcard-for-single-variants` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::match_wildcard_for_single_variants)]`
+
+error: `format!(..)` appended to existing `String`
+   --> src\hardware\introspect.rs:98:17
+    |
+ 98 | /                 out.push_str(&format!(
+ 99 | |                     "RAM: 0x{:08X} - 0x{:08X} ({} KB)\n",
+100 | |                     start,
+101 | |                     end,
+102 | |                     (end - start) / 1024
+103 | |                 ));
+    | |__________________^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+    = note: `-D clippy::format-push-string` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::format_push_string)]`
+
+error: `format!(..)` appended to existing `String`
+   --> src\hardware\introspect.rs:107:17
+    |
+107 | /                 out.push_str(&format!(
+108 | |                     "Flash: 0x{:08X} - 0x{:08X} ({} KB)\n",
+109 | |                     start,
+110 | |                     end,
+111 | |                     (end - start) / 1024
+112 | |                 ));
+    | |__________________^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: unneeded `return` statement
+   --> src\hardware\mod.rs:168:23
+    |
+168 |             Ok(()) => return Ok(()),
+    |                       ^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#needless_return
+    = note: `-D clippy::needless-return` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_return)]`
+help: remove `return`
+    |
+168 -             Ok(()) => return Ok(()),
+168 +             Ok(()) => Ok(()),
+    |
+
+error: unneeded `return` statement
+   --> src\hardware\mod.rs:176:17
+    |
+176 |                 return Err(e.into());
+    |                 ^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#needless_return
+help: remove `return`
+    |
+176 -                 return Err(e.into());
+176 +                 Err(e.into())
+    |
+
+error: useless conversion to the same type: `anyhow::Error`
+   --> src\hardware\mod.rs:176:28
+    |
+176 |                 return Err(e.into());
+    |                            ^^^^^^^^ help: consider removing `.into()`: `e`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#useless_conversion
+    = note: `-D clippy::useless-conversion` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::useless_conversion)]`
+
+error: it is more concise to loop over references to containers instead of using explicit iteration methods
+   --> src\hardware\mod.rs:210:19
+    |
+210 |     for region in target.memory_map.iter() {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^ help: to write this more concisely, try: `&target.memory_map`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#explicit_iter_loop
+
+error: wildcard matches only a single variant and will also match any future added variants
+   --> src\hardware\mod.rs:224:13
+    |
+224 |             _ => {}
+    |             ^ help: try: `MemoryRegion::Generic(_)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#match_wildcard_for_single_variants
+
+error: returning the result of a `let` binding from a block
+  --> src\providers\reliable.rs:55:5
+   |
+48 | /     let model_catalog_mismatch = msg_lower.contains("model")
+49 | |         && (msg_lower.contains("not found")
+50 | |             || msg_lower.contains("unknown")
+51 | |             || msg_lower.contains("unsupported")
+52 | |             || msg_lower.contains("does not exist")
+53 | |             || msg_lower.contains("invalid"));
+   | |______________________________________________- unnecessary `let` binding
+54 |
+55 |       model_catalog_mismatch
+   |       ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#let_and_return
+   = note: `-D clippy::let-and-return` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::let_and_return)]`
+help: return the expression directly
+   |
+48 ~     
+49 |
+50 ~     msg_lower.contains("model")
+51 +         && (msg_lower.contains("not found")
+52 +             || msg_lower.contains("unknown")
+53 +             || msg_lower.contains("unsupported")
+54 +             || msg_lower.contains("does not exist")
+55 +             || msg_lower.contains("invalid"))
+   |
+
+error: this `if` statement can be collapsed
+   --> src\rag\mod.rs:127:16
+    |
+127 |           } else if path.is_file() {
+    |  ________________^
+128 | |             if path.extension().and_then(|e| e.to_str()) == Some("pdf") {
+129 | |                 out.push(path);
+130 | |             }
+131 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+127 ~         } else if path.is_file()
+128 ~             && path.extension().and_then(|e| e.to_str()) == Some("pdf") {
+129 |                 out.push(path);
+130 ~             }
+    |
+
+error: it is more concise to loop over references to containers instead of using explicit iteration methods
+   --> src\tools\hardware_board_info.rs:172:19
+    |
+172 |     for region in target.memory_map.iter() {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^ help: to write this more concisely, try: `&target.memory_map`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#explicit_iter_loop
+
+error: wildcard matches only a single variant and will also match any future added variants
+   --> src\tools\hardware_board_info.rs:192:13
+    |
+192 |             _ => {}
+    |             ^ help: try: `MemoryRegion::Generic(_)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#match_wildcard_for_single_variants
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_board_info.rs:176:17
+    |
+176 | /                 out.push_str(&format!(
+177 | |                     "RAM: 0x{:08X} - 0x{:08X} ({} KB)\n",
+178 | |                     start,
+179 | |                     end,
+180 | |                     (end - start) / 1024
+181 | |                 ));
+    | |__________________^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_board_info.rs:185:17
+    |
+185 | /                 out.push_str(&format!(
+186 | |                     "Flash: 0x{:08X} - 0x{:08X} ({} KB)\n",
+187 | |                     start,
+188 | |                     end,
+189 | |                     (end - start) / 1024
+190 | |                 ));
+    | |__________________^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_memory_map.rs:107:25
+    |
+107 |                         output.push_str(&format!("**{}** (via probe-rs):\n{}\n", board, probe_msg));
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_memory_map.rs:111:25
+    |
+111 |                         output.push_str(&format!("Probe-rs failed: {}. ", e));
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: it is more concise to loop over references to containers instead of using explicit iteration methods
+   --> src\tools\hardware_memory_map.rs:157:19
+    |
+157 |     for region in target.memory_map.iter() {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^ help: to write this more concisely, try: `&target.memory_map`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#explicit_iter_loop
+
+error: wildcard matches only a single variant and will also match any future added variants
+   --> src\tools\hardware_memory_map.rs:177:13
+    |
+177 |             _ => {}
+    |             ^ help: try: `MemoryRegion::Generic(_)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#match_wildcard_for_single_variants
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_memory_map.rs:163:17
+    |
+163 | /                 out.push_str(&format!(
+164 | |                     "RAM: 0x{:08X} - 0x{:08X} ({} KB)\n",
+165 | |                     start, end, size_kb
+166 | |                 ));
+    | |__________________^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_memory_map.rs:172:17
+    |
+172 | /                 out.push_str(&format!(
+173 | |                     "Flash: 0x{:08X} - 0x{:08X} ({} KB)\n",
+174 | |                     start, end, size_kb
+175 | |                 ));
+    | |__________________^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: `format!(..)` appended to existing `String`
+   --> src\tools\hardware_memory_read.rs:180:9
+    |
+180 |         out.push_str(&format!("0x{:08X}  {:48}  {}\n", addr, hex, ascii));
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: consider using `write!` to avoid the extra allocation
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#format_push_string
+
+error: use of `Option<Option<T>>`
+  --> src\tools\proxy_config.rs:99:25
+   |
+99 |     ) -> anyhow::Result<Option<Option<String>>> {
+   |                         ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: consider using `Option<String>`, or a custom enum if you need to distinguish all 3 cases
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#option_option
+   = note: `-D clippy::option-option` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::option_option)]`
+
+error: could not compile `zeroclaw` (lib) due to 24 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `zeroclaw` (lib test) due to 24 previous errors

@@ -7,6 +7,7 @@
 use landlock::{AccessFs, PathBeneath, PathFd, Ruleset, RulesetAttr, RulesetCreatedAttr};
 
 use crate::security::traits::Sandbox;
+#[cfg(all(feature = "sandbox-landlock", target_os = "linux"))]
 use std::path::Path;
 
 /// Landlock sandbox backend for Linux
@@ -151,6 +152,7 @@ impl Sandbox for LandlockSandbox {
 
 // Stub implementations for non-Linux or when feature is disabled
 #[cfg(not(all(feature = "sandbox-landlock", target_os = "linux")))]
+#[derive(Debug)]
 pub struct LandlockSandbox;
 
 #[cfg(not(all(feature = "sandbox-landlock", target_os = "linux")))]
@@ -222,13 +224,14 @@ mod tests {
     fn landlock_with_none_workspace() {
         // Should work even without a workspace directory
         let result = LandlockSandbox::with_workspace(None);
-        // Result depends on platform and feature flag
-        match result {
-            Ok(sandbox) => assert!(sandbox.is_available()),
-            Err(_) => assert!(!cfg!(all(
-                feature = "sandbox-landlock",
-                target_os = "linux"
-            ))),
+        #[cfg(all(feature = "sandbox-landlock", target_os = "linux"))]
+        {
+            assert!(result.is_ok());
+            assert!(result.unwrap().is_available());
+        }
+        #[cfg(not(all(feature = "sandbox-landlock", target_os = "linux")))]
+        {
+            assert!(result.is_err());
         }
     }
 

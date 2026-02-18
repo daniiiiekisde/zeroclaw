@@ -13,6 +13,11 @@ pub struct ProxyConfigTool {
     security: Arc<SecurityPolicy>,
 }
 
+enum Update<T> {
+    Absent,
+    Set(Option<T>),
+}
+
 impl ProxyConfigTool {
     pub fn new(config: Arc<Config>, security: Arc<SecurityPolicy>) -> Self {
         Self { config, security }
@@ -93,16 +98,13 @@ impl ProxyConfigTool {
         anyhow::bail!("'{field}' must be a string or string[]")
     }
 
-    fn parse_optional_string_update(
-        args: &Value,
-        field: &str,
-    ) -> anyhow::Result<Option<Option<String>>> {
+    fn parse_optional_string_update(args: &Value, field: &str) -> anyhow::Result<Update<String>> {
         let Some(raw) = args.get(field) else {
-            return Ok(None);
+            return Ok(Update::Absent);
         };
 
         if raw.is_null() {
-            return Ok(Some(None));
+            return Ok(Update::Set(None));
         }
 
         let value = raw
@@ -110,7 +112,7 @@ impl ProxyConfigTool {
             .ok_or_else(|| anyhow::anyhow!("'{field}' must be a string or null"))?
             .trim()
             .to_string();
-        Ok(Some((!value.is_empty()).then_some(value)))
+        Ok(Update::Set((!value.is_empty()).then_some(value)))
     }
 
     fn env_snapshot() -> Value {
@@ -185,17 +187,17 @@ impl ProxyConfigTool {
             })?;
         }
 
-        if let Some(update) = Self::parse_optional_string_update(args, "http_proxy")? {
+        if let Update::Set(update) = Self::parse_optional_string_update(args, "http_proxy")? {
             proxy.http_proxy = update;
             touched_proxy_url = true;
         }
 
-        if let Some(update) = Self::parse_optional_string_update(args, "https_proxy")? {
+        if let Update::Set(update) = Self::parse_optional_string_update(args, "https_proxy")? {
             proxy.https_proxy = update;
             touched_proxy_url = true;
         }
 
-        if let Some(update) = Self::parse_optional_string_update(args, "all_proxy")? {
+        if let Update::Set(update) = Self::parse_optional_string_update(args, "all_proxy")? {
             proxy.all_proxy = update;
             touched_proxy_url = true;
         }

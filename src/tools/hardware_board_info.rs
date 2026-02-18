@@ -159,6 +159,7 @@ impl Tool for HardwareBoardInfoTool {
 fn probe_board_info(chip: &str) -> anyhow::Result<String> {
     use probe_rs::config::MemoryRegion;
     use probe_rs::{Session, SessionConfig};
+    use std::fmt::Write;
 
     let session = Session::auto_attach(chip, SessionConfig::default())
         .map_err(|e| anyhow::anyhow!("{}", e))?;
@@ -173,21 +174,23 @@ fn probe_board_info(chip: &str) -> anyhow::Result<String> {
         match region {
             MemoryRegion::Ram(ram) => {
                 let (start, end) = (ram.range.start, ram.range.end);
-                out.push_str(&format!(
+                let _ = write!(
+                    out,
                     "RAM: 0x{:08X} - 0x{:08X} ({} KB)\n",
                     start,
                     end,
                     (end - start) / 1024
-                ));
+                );
             }
             MemoryRegion::Nvm(flash) => {
                 let (start, end) = (flash.range.start, flash.range.end);
-                out.push_str(&format!(
+                let _ = write!(
+                    out,
                     "Flash: 0x{:08X} - 0x{:08X} ({} KB)\n",
                     start,
                     end,
                     (end - start) / 1024
-                ));
+                );
             }
             _ => {}
         }
