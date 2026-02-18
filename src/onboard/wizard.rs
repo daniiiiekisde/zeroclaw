@@ -159,10 +159,54 @@ pub fn run_wizard() -> Result<Config> {
     // No need to save here as scaffold writes files. But we can save strict config.
     confirm_save_progress(&config, &mut auto_save_enabled)?;
 
+<<<<<<< HEAD
     // ── Build complete config ──
     // Some defaults might need forcing if not set above
     config.default_temperature = 0.7;
     // ... other defaults are handled by Config::default()
+=======
+    // ── Build config ──
+    // Defaults: SQLite memory, supervised autonomy, workspace-scoped, native runtime
+    let config = Config {
+        workspace_dir: workspace_dir.clone(),
+        config_path: config_path.clone(),
+        api_key: if api_key.is_empty() {
+            None
+        } else {
+            Some(api_key)
+        },
+        api_url: provider_api_url,
+        default_provider: Some(provider),
+        default_model: Some(model),
+        default_temperature: 0.7,
+        observability: ObservabilityConfig::default(),
+        autonomy: AutonomyConfig::default(),
+        runtime: RuntimeConfig::default(),
+        reliability: crate::config::ReliabilityConfig::default(),
+        scheduler: crate::config::schema::SchedulerConfig::default(),
+        agent: crate::config::schema::AgentConfig::default(),
+        model_routes: Vec::new(),
+        heartbeat: HeartbeatConfig::default(),
+        cron: crate::config::CronConfig::default(),
+        channels_config,
+        memory: memory_config, // User-selected memory backend
+        storage: StorageConfig::default(),
+        tunnel: tunnel_config,
+        gateway: crate::config::GatewayConfig::default(),
+        composio: composio_config,
+        secrets: secrets_config,
+        browser: BrowserConfig::default(),
+        http_request: crate::config::HttpRequestConfig::default(),
+        web_search: crate::config::WebSearchConfig::default(),
+        proxy: crate::config::ProxyConfig::default(),
+        identity: crate::config::IdentityConfig::default(),
+        cost: crate::config::CostConfig::default(),
+        peripherals: crate::config::PeripheralsConfig::default(),
+        agents: std::collections::HashMap::new(),
+        hardware: hardware_config,
+        query_classification: crate::config::QueryClassificationConfig::default(),
+    };
+>>>>>>> e3c949b6375263aecf5e2d252277befa3bfa6f3b
 
     println!(
         "  {} Security: {} | workspace-scoped",
