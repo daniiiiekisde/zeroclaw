@@ -59,8 +59,7 @@ const CUSTOM_MODEL_SENTINEL: &str = "__custom_model__";
 fn confirm_save_progress(config: &Config, auto_save: &mut bool) -> Result<()> {
     if *auto_save {
         config.save()?;
-        // Minimal feedback for auto-save
-        // println!("  {} Saved", style("✓").dim()); 
+        // println!("  {} Saved", style("✓").dim());
         return Ok(());
     }
 
@@ -159,54 +158,10 @@ pub fn run_wizard() -> Result<Config> {
     // No need to save here as scaffold writes files. But we can save strict config.
     confirm_save_progress(&config, &mut auto_save_enabled)?;
 
-<<<<<<< HEAD
     // ── Build complete config ──
     // Some defaults might need forcing if not set above
     config.default_temperature = 0.7;
     // ... other defaults are handled by Config::default()
-=======
-    // ── Build config ──
-    // Defaults: SQLite memory, supervised autonomy, workspace-scoped, native runtime
-    let config = Config {
-        workspace_dir: workspace_dir.clone(),
-        config_path: config_path.clone(),
-        api_key: if api_key.is_empty() {
-            None
-        } else {
-            Some(api_key)
-        },
-        api_url: provider_api_url,
-        default_provider: Some(provider),
-        default_model: Some(model),
-        default_temperature: 0.7,
-        observability: ObservabilityConfig::default(),
-        autonomy: AutonomyConfig::default(),
-        runtime: RuntimeConfig::default(),
-        reliability: crate::config::ReliabilityConfig::default(),
-        scheduler: crate::config::schema::SchedulerConfig::default(),
-        agent: crate::config::schema::AgentConfig::default(),
-        model_routes: Vec::new(),
-        heartbeat: HeartbeatConfig::default(),
-        cron: crate::config::CronConfig::default(),
-        channels_config,
-        memory: memory_config, // User-selected memory backend
-        storage: StorageConfig::default(),
-        tunnel: tunnel_config,
-        gateway: crate::config::GatewayConfig::default(),
-        composio: composio_config,
-        secrets: secrets_config,
-        browser: BrowserConfig::default(),
-        http_request: crate::config::HttpRequestConfig::default(),
-        web_search: crate::config::WebSearchConfig::default(),
-        proxy: crate::config::ProxyConfig::default(),
-        identity: crate::config::IdentityConfig::default(),
-        cost: crate::config::CostConfig::default(),
-        peripherals: crate::config::PeripheralsConfig::default(),
-        agents: std::collections::HashMap::new(),
-        hardware: hardware_config,
-        query_classification: crate::config::QueryClassificationConfig::default(),
-    };
->>>>>>> e3c949b6375263aecf5e2d252277befa3bfa6f3b
 
     println!(
         "  {} Security: {} | workspace-scoped",
@@ -1421,9 +1376,9 @@ fn setup_workspace(existing: Option<&Config>) -> Result<(PathBuf, PathBuf)> {
     if let Some(cfg) = existing {
         // If we have an existing workspace that isn't the default, default to "No" for "Use default workspace?"
         // and pre-fill the custom path.
-        let workspaces_match = cfg.workspace_dir.parent() == Some(&default_dir) 
+        let workspaces_match = cfg.workspace_dir.parent() == Some(&default_dir)
              || cfg.workspace_dir == default_dir.join("workspace");
-             
+
         if !workspaces_match {
              use_default = false;
              if let Some(parent) = cfg.workspace_dir.parent() {
@@ -2357,7 +2312,7 @@ fn setup_hardware(existing: Option<&Config>) -> Result<HardwareConfig> {
     ];
 
     let mut recommended = hardware::recommended_wizard_default(&devices);
-    
+
     // Override recommendation with existing config if present
     if let Some(cfg) = existing {
         recommended = match cfg.hardware.transport_mode() {
@@ -2382,7 +2337,7 @@ fn setup_hardware(existing: Option<&Config>) -> Result<HardwareConfig> {
             .iter()
             .filter(|d| d.transport == hardware::HardwareTransport::Serial)
             .collect();
-            
+
         // Attempt to find index of existing serial port
         let mut default_port_idx = 0;
         if let Some(cfg) = existing {
@@ -2434,7 +2389,7 @@ fn setup_hardware(existing: Option<&Config>) -> Result<HardwareConfig> {
             "230400",
             "Custom",
         ];
-        
+
         // Find existing baud rate index
         let mut default_baud_idx = 0;
         if let Some(cfg) = existing {
@@ -2446,7 +2401,7 @@ fn setup_hardware(existing: Option<&Config>) -> Result<HardwareConfig> {
                 _ => 4, // Custom
             };
         }
-        
+
         let baud_idx = Select::new()
             .with_prompt("  Serial baud rate")
             .items(&baud_options)
@@ -2665,7 +2620,7 @@ fn setup_memory(existing: Option<&Config>) -> Result<MemoryConfig> {
 
     let backend = backend_key_from_choice(choice);
     let profile = memory_backend_profile(backend);
-    
+
     let default_autosave = if let Some(cfg) = existing {
         cfg.memory.auto_save
     } else {
